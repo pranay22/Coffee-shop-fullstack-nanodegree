@@ -77,25 +77,26 @@ def get_drink_detail(payload):
 @app.route('/drinks', methods=['POST'])
 @requires_auth('post:drinks')
 def create_new_drink(payload):
-    # Fftch Input
-    inputReq = request.get_json()
-    try:
-        d = Drink()
-        d.title = inputReq['title']
-        d.recipe = json.dumps(inputReq['recipe'])
-        # add Newly created drink
-        d.insert()
+    # fetch Input
+    if request.data:
+        inputReqData = json.loads(request.data.decode('utf-8'))
+        try:
+            d = Drink()
+            d.title = inputReqData['title']
+            d.recipe = json.dumps(inputReqData['recipe'])
+            # add Newly created drink
+            d.insert()
 
-    except Exception:
-        abort(400)
+        except Exception:
+            abort(400)
 
-    result = {
-        'success': True,
-        'drinks': [d.long()]
-    }
+        result = {
+            'success': True,
+            'drinks': [d.long()]
+        }
 
-    # Explicitly returning status code 200 as it is mentioned in the requirements
-    return jsonify(result), 200
+        # Explicitly returning status code 200 as it is mentioned in the requirements
+        return jsonify(result), 200
 
 
 '''
@@ -121,6 +122,30 @@ def create_new_drink(payload):
     returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks/<int:id>', methods=['DELETE'])
+@requires_auth('delete:drinks')
+def delete_drinks(payload, id):
+    # fetch drink details for the input ID with one_or_none() for subsequent validaity checksss
+    drinkData = Drink.query.filter(Drink.id == id).one_or_none()
+
+    # Req 1: throw 404 error is no drink is found
+    if not drinkData:
+        abort(404)
+
+    # try to delete drink and in case of error throw exception
+    try:
+        drinkData.delete()
+    except Exception:
+        abort(400)
+
+    result = {
+            'success': True,
+            'delete': id
+        }
+
+    # Explicitly returning status code 200 as it is mentioned in the requirements
+    return jsonify(result), 200
+
 
 
 # Error Handling
