@@ -29,6 +29,7 @@ CORS(app)
 '''
 @app.route('/drinks', methods=['GET'])
 def get_drinks():
+    # getting all drinks from db
     allDrinks = Drink.query.all()
     if len(allDrinks) == 0:
         abort(404)
@@ -73,6 +74,28 @@ def get_drink_detail(payload):
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks', methods=['POST'])
+@requires_auth('post:drinks')
+def create_new_drink(payload):
+    # Fftch Input
+    inputReq = request.get_json()
+    try:
+        d = Drink()
+        d.title = inputReq['title']
+        d.recipe = json.dumps(inputReq['recipe'])
+        # add Newly created drink
+        d.insert()
+
+    except Exception:
+        abort(400)
+
+    result = {
+        'success': True,
+        'drinks': [d.long()]
+    }
+
+    # Explicitly returning status code 200 as it is mentioned in the requirements
+    return jsonify(result), 200
 
 
 '''
