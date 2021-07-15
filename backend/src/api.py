@@ -110,7 +110,39 @@ def createNewDrink(payload):
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks/<int:id>', methods=['PATCH'])
+@requires_auth('patch:drinks')
+def updateDrink(payload, id):
+    # Get the body
+    requestData = json.loads(request.data.decode('utf-8'))
 
+    # fetch deink details with ID with one_or_none() for subsequent validity check
+    drinkData = Drink.query.filter(Drink.id == id).one_or_none()
+    # Req 1: throw 404 error is no drink is found
+    if not drinkData:
+        abort(404)
+
+    try:
+        requestTitle = requestData.get('title')
+        requestRecipe = requestData.get('recipe')
+
+        # update title / receipie if they are updated
+        if requestTitle:
+            drinkData.title = requestTitle
+        if requestRecipe:
+            drinkData.recipe = json.dumps(requestData['recipe'])
+        # update
+        drinkData.update()
+    except Exception:
+        abort(400)
+
+    result = {
+        'success': True,
+        'drinks': [drinkData.long()]
+    }
+
+    # Explicitly returning status code 200 as it is mentioned in the requirements
+    return jsonify(result), 200
 
 '''
 @TODO implement endpoint
@@ -125,9 +157,8 @@ def createNewDrink(payload):
 @app.route('/drinks/<int:id>', methods=['DELETE'])
 @requires_auth('delete:drinks')
 def deleteDrinks(payload, id):
-    # fetch drink details for the input ID with one_or_none() for subsequent validaity checksss
+    # fetch drink details for the input ID with one_or_none() for subsequent validaity check
     drinkData = Drink.query.filter(Drink.id == id).one_or_none()
-
     # Req 1: throw 404 error is no drink is found
     if not drinkData:
         abort(404)
