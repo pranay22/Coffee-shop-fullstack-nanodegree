@@ -13,3 +13,5 @@ export const environment = {
     callbackURL: 'https://127.0.0.1:3000/tabs/user-page'
   }
 };
+
+//https://dev-3ncdr6eo.eu.auth0.com/authorize?audiance=coffeeShop&response_type=token&client_id=IcZWvybw42PUruxtP6zTtvDY2OD9eNzz&redirect_uri=https://127.0.0.1:3000/tabs/user-page
