@@ -32,9 +32,8 @@ class AuthError(Exception):
 '''
 # soruce : https://github.com/udacity/FSND/blob/master/BasicFlaskAuth/app.py
 def get_token_auth_header():
-    """Obtains the Access Token from the Authorization Header
-    """
-   auth = request.headers.get('Authorization', None)
+    # Obtains the Access Token from the Authorization Header
+    auth = request.headers.get('Authorization', None)
     if not auth:
         raise AuthError({
             'code': 'authorization_header_missing',
@@ -63,20 +62,23 @@ def get_token_auth_header():
     return token
 
 '''
-@TODO implement check_permissions(permission, payload) method
-    @INPUTS
-        permission: string permission (i.e. 'post:drink')
-        payload: decoded jwt payload
+    @TODO implement check_permissions(permission, payload) method
+        @INPUTS
+            permission: string permission (i.e. 'post:drink')
+            payload: decoded jwt payload
 
-    it should raise an AuthError if permissions are not included in the payload
-        !!NOTE check your RBAC settings in Auth0
-    it should raise an AuthError if the requested permission string is not in the payload permissions array
-    return true otherwise
+        it should raise an AuthError if permissions are not included in the payload
+            !!NOTE check your RBAC settings in Auth0
+        it should raise an AuthError if the requested permission string is not in the payload permissions array
+        return true otherwise
 '''
 def check_permissions(permission, payload):
     #Throw error if no permission
     if 'permissions' not in payload:
-        abort(400)
+        raise AuthError({
+            'code': 'invalid_payload',
+            'description': 'Permission Not found',
+        }, 400)
 
     if permission not in payload['permissions']:
         raise AuthError({

@@ -217,7 +217,7 @@ def errorNotFound(error):
         "error": 404,
         "message": "Resource Not Found"
     }
-    return jsonify(error_data), 404
+    return jsonify(errorData), 404
 
 
 
@@ -226,7 +226,7 @@ def errorNotFound(error):
     error handler should conform to general task above
 '''
 @app.errorhandler(AuthError)
-def authEror(error):
+def authEror(e):
     return jsonify(e.error), e.status_code
 
 
